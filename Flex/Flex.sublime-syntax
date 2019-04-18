@@ -22,15 +22,38 @@ contexts:
     # strings in YAML. When using single quoted strings, only single quotes
     # need to be escaped: this is done by using two single quotes next to each
     # other.
-    - match: '\b(if|else|for|while|char|extern)\b'
+    - match: '(extern\b|while|if|else|case|return\b|EOF)'
       scope: keyword.control.flex
-
+    - match: '(int\b|\bstring\b)'
+      scope: support.type.stdint.flex
+    #type defines of the character
+    - match: '(true|TRUE|FALSE|false)'
+      scope: constant.language.flex 
     # Numbers
     - match: '\b(-)?[0-9.]+\b'
       scope: constant.numeric.flex
-    #DEfines
-    - match: '(#define\b |#include\b)'
+    #defines
+    - match: '(#define\b |#include\b|#undef\b)'
       scope: keyword.control.flex
+    #operators
+    - match: '(?:\+\+|--)'
+      scope: keyword.operator.arithmetic.flex
+    #puntuations
+    - match: '->'
+      scope: punctuation.accessor.flex
+    - match: <\=|>\=|\=\=|<|>|\!\=
+      scope: keyword.operator.comparison.c
+
+    - match: '(\\)$\n'
+      captures:
+        1: punctuation.separator.continuation.flex
+      push: preprocessor-line-continuation
+    - match: '\\(\s+?)$'
+      captures:
+        1: invalid.illegal.space-after-continuation.flex 
+      push: preprocessor-line-continuation
+
+
 
   double_quoted_string:
     - meta_scope: string.quoted.double.flex
@@ -44,4 +67,7 @@ contexts:
     - meta_scope: comment.line.flex
     - match: '\*/'
       scope: punctuation.definition.comment.flex
+      pop: true
+  preprocessor-line-continuation:
+    - match: '$\n'
       pop: true
